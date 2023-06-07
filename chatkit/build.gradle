@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 33
-
+    namespace = "com.mikashboks.chatkit"
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 33

@@ -21,7 +21,7 @@ import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 
-import com.stfalcon.chatkit.R;
+import com.mikashboks.chatkit.R;
 import com.stfalcon.chatkit.commons.Style;
 
 /**
