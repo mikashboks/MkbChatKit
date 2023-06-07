@@ -24,6 +24,7 @@
             android:id="@id/messageText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Text"
             android:layout_alignWithParentIfMissing="true" />
 
         <TextView
@@ -31,6 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/messageText"
+            android:text="Time"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             app:layout_alignSelf="center"
