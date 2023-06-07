@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 33
     defaultConfig {
-        applicationId "com.stfalcon.chatkit.sample"
+        applicationId "com.mikashboks.chatkit.sample"
         minSdkVersion 21
         targetSdkVersion 33
         versionCode 1

@@ -29,7 +29,7 @@ import androidx.annotation.DimenRes;
 import androidx.annotation.DrawableRes;
 import androidx.core.content.ContextCompat;
 
-import com.stfalcon.chatkit.R;
+import com.mikashboks.chatkit.R;
 
 /**
  * Base class for chat component styles

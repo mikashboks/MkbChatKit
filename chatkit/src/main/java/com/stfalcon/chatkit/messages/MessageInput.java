@@ -32,7 +32,7 @@ import android.widget.TextView;
 
 import androidx.core.view.ViewCompat;
 
-import com.stfalcon.chatkit.R;
+import com.mikashboks.chatkit.R;
 
 import java.lang.reflect.Field;
 

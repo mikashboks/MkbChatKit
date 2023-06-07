@@ -28,7 +28,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.core.graphics.drawable.DrawableCompat;
 
-import com.stfalcon.chatkit.R;
+import com.mikashboks.chatkit.R;
 import com.stfalcon.chatkit.commons.Style;
 
 /**
