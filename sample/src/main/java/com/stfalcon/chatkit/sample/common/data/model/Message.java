@@ -15,6 +15,7 @@ public class Message implements IMessage,
     private String id;
     private String text;
     private Date createdAt;
+    private Boolean unread;
     private User user;
     private Image image;
     private Voice voice;
@@ -24,10 +25,15 @@ public class Message implements IMessage,
     }
 
     public Message(String id, User user, String text, Date createdAt) {
+        this(id, user, text, createdAt, true);
+    }
+
+    public Message(String id, User user, String text, Date createdAt, Boolean unread) {
         this.id = id;
         this.text = text;
         this.user = user;
         this.createdAt = createdAt;
+        this.unread = unread;
     }
 
     @Override
@@ -55,6 +61,11 @@ public class Message implements IMessage,
         return image == null ? null : image.url;
     }
 
+    @Override
+    public Boolean isUnread() {
+        return unread;
+    }
+
     public Voice getVoice() {
         return voice;
     }
@@ -77,6 +88,14 @@ public class Message implements IMessage,
 
     public void setVoice(Voice voice) {
         this.voice = voice;
+    }
+
+    public Boolean getUnread() {
+        return unread;
+    }
+
+    public void setUnread(Boolean unread) {
+        this.unread = unread;
     }
 
     public static class Image {

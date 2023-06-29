@@ -19,6 +19,7 @@ import com.mikashboks.chatkit.R;
 import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.commons.ViewHolder;
 import com.stfalcon.chatkit.commons.models.IMessage;
+import com.stfalcon.chatkit.commons.models.MessageUnread;
 import com.stfalcon.chatkit.commons.models.MessageContentType;
 import com.stfalcon.chatkit.utils.DateFormatter;
 import com.stfalcon.chatkit.utils.RoundedImageView;
@@ -37,9 +38,12 @@ public class MessageHolders {
     private static final short VIEW_TYPE_DATE_HEADER = 130;
     private static final short VIEW_TYPE_TEXT_MESSAGE = 131;
     private static final short VIEW_TYPE_IMAGE_MESSAGE = 132;
+    private static final short VIEW_TYPE_UNREAD_MESSAGE = 134;
 
     private Class<? extends ViewHolder<Date>> dateHeaderHolder;
+    private Class<? extends ViewHolder<MessageUnread>> unreadHeaderHolder;
     private int dateHeaderLayout;
+    private int unreadHeaderLayout;
 
     private HolderConfig<IMessage> incomingTextConfig;
     private HolderConfig<IMessage> outcomingTextConfig;
@@ -52,6 +56,9 @@ public class MessageHolders {
     public MessageHolders() {
         this.dateHeaderHolder = DefaultDateHeaderViewHolder.class;
         this.dateHeaderLayout = R.layout.item_date_header;
+
+        this.unreadHeaderHolder = DefaultUnreadHeaderViewHolder.class;
+        this.unreadHeaderLayout = R.layout.item_unread_header;
 
         this.incomingTextConfig = new HolderConfig<>(DefaultIncomingTextMessageViewHolder.class, R.layout.item_incoming_text_message);
         this.outcomingTextConfig = new HolderConfig<>(DefaultOutcomingTextMessageViewHolder.class, R.layout.item_outcoming_text_message);
@@ -433,6 +440,43 @@ public class MessageHolders {
     }
 
     /**
+     * Sets both of custom view holder class and layout resource for unread header
+     *
+     * @param holder holder class.
+     * @param layout layout resource.
+     * @return {@link MessageHolders} for subsequent configuration.
+     */
+    public MessageHolders setUnreadHeaderConfig(
+            @NonNull Class<? extends ViewHolder<MessageUnread>> holder,
+            @LayoutRes int layout) {
+        this.unreadHeaderHolder = holder;
+        this.unreadHeaderLayout = layout;
+        return this;
+    }
+
+    /**
+     * Sets custom view holder class for unread header.
+     *
+     * @param holder holder class.
+     * @return {@link MessageHolders} for subsequent configuration.
+     */
+    public MessageHolders setUnreadHeaderHolder(@NonNull Class<? extends ViewHolder<MessageUnread>> holder) {
+        this.unreadHeaderHolder = holder;
+        return this;
+    }
+
+    /**
+     * Sets custom layout resource for unread header.
+     *
+     * @param layout layout resource.
+     * @return {@link MessageHolders} for subsequent configuration.
+     */
+    public MessageHolders setUnreadHeaderLayout(@LayoutRes int layout) {
+        this.unreadHeaderLayout = layout;
+        return this;
+    }
+
+    /**
      * Registers custom content type (e.g. multimedia, events etc.)
      *
      * @param type            unique id for content type
@@ -540,6 +584,8 @@ public class MessageHolders {
 
     protected ViewHolder getHolder(ViewGroup parent, int viewType, MessagesListStyle messagesListStyle) {
         switch (viewType) {
+            case VIEW_TYPE_UNREAD_MESSAGE:
+                return getHolder(parent, unreadHeaderLayout, unreadHeaderHolder, messagesListStyle, null);
             case VIEW_TYPE_DATE_HEADER:
                 return getHolder(parent, dateHeaderLayout, dateHeaderHolder, messagesListStyle, null);
             case VIEW_TYPE_TEXT_MESSAGE:
@@ -601,6 +647,8 @@ public class MessageHolders {
             isOutcoming = message.getUser().getId().contentEquals(senderId);
             viewType = getContentViewType(message);
 
+        } else if (item instanceof MessageUnread) {
+            viewType = VIEW_TYPE_UNREAD_MESSAGE;
         } else viewType = VIEW_TYPE_DATE_HEADER;
 
         return isOutcoming ? viewType * -1 : viewType;
@@ -1012,7 +1060,8 @@ public class MessageHolders {
         public void onBind(Date date) {
             if (text != null) {
                 String formattedDate = null;
-                if (dateHeadersFormatter != null) formattedDate = dateHeadersFormatter.format(date);
+                if (dateHeadersFormatter != null)
+                    formattedDate = dateHeadersFormatter.format(date);
                 text.setText(formattedDate == null ? DateFormatter.format(date, dateFormat) : formattedDate);
             }
         }
@@ -1029,6 +1078,30 @@ public class MessageHolders {
             dateFormat = style.getDateHeaderFormat();
             dateFormat = dateFormat == null ? DateFormatter.Template.STRING_DAY_MONTH_YEAR.get() : dateFormat;
         }
+    }
+
+    /**
+     * Default view holder implementation for unread header
+     */
+    public static class DefaultUnreadHeaderViewHolder extends ViewHolder<MessageUnread>
+            implements DefaultMessageViewHolder {
+
+        protected TextView text;
+
+        public DefaultUnreadHeaderViewHolder(View itemView) {
+            super(itemView);
+            text = itemView.findViewById(R.id.messageText);
+        }
+
+        @Override
+        public void onBind(MessageUnread messageUnread) {
+            if (text != null) {
+                text.setText(text.getContext().getString(R.string.unread_messages, String.valueOf(messageUnread.totalUnread)));
+            }
+        }
+
+        @Override
+        public void applyStyle(MessagesListStyle style) {}
     }
 
     /**

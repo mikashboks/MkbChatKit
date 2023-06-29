@@ -50,4 +50,11 @@ public interface IMessage {
      * @return the message creation date
      */
     Date getCreatedAt();
+
+    /**
+     * Is message unread
+     *
+     * @return boolean whether message unread
+     */
+    Boolean isUnread();
 }
