@@ -35,6 +35,8 @@ import com.mikashboks.chatkit.R;
 import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.commons.ViewHolder;
 import com.stfalcon.chatkit.commons.models.IMessage;
+import com.stfalcon.chatkit.commons.models.MessageUnread;
+import com.stfalcon.chatkit.utils.CollectionUtils;
 import com.stfalcon.chatkit.utils.DateFormatter;
 
 import java.util.ArrayList;
@@ -52,7 +54,7 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
 
     protected static boolean isSelectionModeEnabled;
 
-    protected List<Wrapper> items;
+    protected List<Wrapper<Object>> items;
     private MessageHolders holders;
     private String senderId;
 
@@ -154,7 +156,7 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
         if (isNewMessageToday) {
             items.add(0, new Wrapper<>(message.getCreatedAt()));
         }
-        Wrapper<MESSAGE> element = new Wrapper<>(message);
+        Wrapper<Object> element = new Wrapper<>(message);
         items.add(0, element);
         notifyItemRangeInserted(0, isNewMessageToday ? 2 : 1);
         if (layoutManager != null && scroll) {
@@ -183,7 +185,7 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
         }
 
         int oldSize = items.size();
-        generateDateHeaders(messages);
+        generateHeaders(messages);
         notifyItemRangeInserted(oldSize, items.size() - oldSize);
     }
 
@@ -205,7 +207,7 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
     public boolean update(String oldId, MESSAGE newMessage) {
         int position = getMessagePositionById(oldId);
         if (position >= 0) {
-            Wrapper<MESSAGE> element = new Wrapper<>(newMessage);
+            Wrapper<Object> element = new Wrapper<>(newMessage);
             items.set(position, element);
             notifyItemChanged(position);
             return true;
@@ -222,7 +224,7 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
     public void updateAndMoveToStart(MESSAGE newMessage) {
         int position = getMessagePositionById(newMessage.getId());
         if (position >= 0) {
-            Wrapper<MESSAGE> element = new Wrapper<>(newMessage);
+            Wrapper<Object> element = new Wrapper<>(newMessage);
             items.remove(position);
             items.add(0, element);
             notifyItemMoved(position, 0);
@@ -529,11 +531,20 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
         }
     }
 
-    protected void generateDateHeaders(List<MESSAGE> messages) {
+    protected void generateHeaders(List<MESSAGE> messages) {
         for (int i = 0; i < messages.size(); i++) {
             MESSAGE message = messages.get(i);
             this.items.add(new Wrapper<>(message));
+
+            // Generate total unread
+            if (message.isUnread() && !CollectionUtils.hasUnreadMessages(this.items)) {
+                this.items.add(new Wrapper<>(new MessageUnread(
+                        CollectionUtils.countUnreadMessages(this.items)
+                )));
+            }
+
             if (messages.size() > i + 1) {
+                // add unread message item
                 MESSAGE nextMessage = messages.get(i + 1);
                 if (!DateFormatter.isSameDay(message.getCreatedAt(), nextMessage.getCreatedAt())) {
                     this.items.add(new Wrapper<>(message.getCreatedAt()));
@@ -571,8 +582,9 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
     private boolean isPreviousSameAuthor(String id, int position) {
         int prevPosition = position + 1;
         if (items.size() <= prevPosition) return false;
-        else return items.get(prevPosition).item instanceof IMessage
-                && ((MESSAGE) items.get(prevPosition).item).getUser().getId().contentEquals(id);
+        else
+            return items.get(prevPosition).item instanceof IMessage
+                    && ((MESSAGE) items.get(prevPosition).item).getUser().getId().contentEquals(id);
     }
 
     private void incrementSelectedItemsCount() {
@@ -622,7 +634,8 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
             if (selectionListener != null && isSelectionModeEnabled) {
                 wrapper.isSelected = !wrapper.isSelected;
 
-                if (wrapper.isSelected) incrementSelectedItemsCount();
+                if (wrapper.isSelected)
+                    incrementSelectedItemsCount();
                 else decrementSelectedItemsCount();
 
                 MESSAGE message = (wrapper.item);
@@ -949,7 +962,8 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
         public void onBind(Date date) {
             if (text != null) {
                 String formattedDate = null;
-                if (dateHeadersFormatter != null) formattedDate = dateHeadersFormatter.format(date);
+                if (dateHeadersFormatter != null)
+                    formattedDate = dateHeadersFormatter.format(date);
                 text.setText(formattedDate == null ? DateFormatter.format(date, dateFormat) : formattedDate);
             }
         }

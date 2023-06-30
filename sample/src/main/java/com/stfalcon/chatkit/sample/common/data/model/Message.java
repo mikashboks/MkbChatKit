@@ -25,7 +25,7 @@ public class Message implements IMessage,
     }
 
     public Message(String id, User user, String text, Date createdAt) {
-        this(id, user, text, createdAt, true);
+        this(id, user, text, createdAt, false);
     }
 
     public Message(String id, User user, String text, Date createdAt, Boolean unread) {

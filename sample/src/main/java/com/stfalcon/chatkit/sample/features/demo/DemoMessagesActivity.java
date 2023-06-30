@@ -49,7 +49,7 @@ public abstract class DemoMessagesActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        messagesAdapter.addToStart(MessagesFixtures.getTextMessage(), true);
+        loadMessages(false);
     }
 
     @Override
@@ -87,7 +87,7 @@ public abstract class DemoMessagesActivity extends AppCompatActivity
     public void onLoadMore(int page, int totalItemsCount) {
         Log.i("TAG", "onLoadMore: " + page + " " + totalItemsCount);
         if (totalItemsCount < TOTAL_MESSAGES_COUNT) {
-            loadMessages();
+            loadMessages(true);
         }
     }
 
@@ -98,13 +98,19 @@ public abstract class DemoMessagesActivity extends AppCompatActivity
         menu.findItem(R.id.action_copy).setVisible(count > 0);
     }
 
-    protected void loadMessages() {
-        //imitation of internet connection
-        new Handler().postDelayed(() -> {
+    protected void loadMessages(Boolean useDelay) {
+        if (useDelay) {
+            //imitation of internet connection
+            new Handler().postDelayed(() -> {
+                ArrayList<Message> messages = MessagesFixtures.getMessages(lastLoadedDate);
+                lastLoadedDate = messages.get(messages.size() - 1).getCreatedAt();
+                messagesAdapter.addToEnd(messages, false);
+            }, 1000);
+        } else {
             ArrayList<Message> messages = MessagesFixtures.getMessages(lastLoadedDate);
             lastLoadedDate = messages.get(messages.size() - 1).getCreatedAt();
             messagesAdapter.addToEnd(messages, false);
-        }, 1000);
+        }
     }
 
     private MessagesListAdapter.Formatter<Message> getMessageStringFormatter() {

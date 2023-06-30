@@ -53,6 +53,10 @@ public final class MessagesFixtures extends FixturesData {
                 calendar.add(Calendar.DAY_OF_MONTH, -(i * i + 1));
 
                 message.setCreatedAt(calendar.getTime());
+
+                if(j == countPerDay - 1) {
+                    message.setUnread(true);
+                }
                 messages.add(message);
             }
         }
