@@ -1,7 +1,9 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
     compileSdkVersion 33
+    namespace = "com.stfalcon.chatkit.sample"
     defaultConfig {
         applicationId "com.mikashboks.chatkit.sample"
         minSdkVersion 21
@@ -31,7 +33,7 @@ android {
 dependencies {
     implementation project(':chatkit')
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    // implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
