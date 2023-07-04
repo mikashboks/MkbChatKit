@@ -15,10 +15,12 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
 
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.mikashboks.chatkit.R;
 import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.commons.ViewHolder;
 import com.stfalcon.chatkit.commons.models.IMessage;
+import com.stfalcon.chatkit.commons.models.LoadMoreProgress;
 import com.stfalcon.chatkit.commons.models.MessageUnread;
 import com.stfalcon.chatkit.commons.models.MessageContentType;
 import com.stfalcon.chatkit.utils.DateFormatter;
@@ -39,11 +41,14 @@ public class MessageHolders {
     private static final short VIEW_TYPE_TEXT_MESSAGE = 131;
     private static final short VIEW_TYPE_IMAGE_MESSAGE = 132;
     private static final short VIEW_TYPE_UNREAD_MESSAGE = 134;
+    private static final short VIEW_TYPE_PROGRESS = 135;
 
     private Class<? extends ViewHolder<Date>> dateHeaderHolder;
     private Class<? extends ViewHolder<MessageUnread>> unreadHeaderHolder;
+    private Class<? extends ViewHolder<LoadMoreProgress>> loadMoreProgressHolder;
     private int dateHeaderLayout;
     private int unreadHeaderLayout;
+    private int loadMoreProgressLayout;
 
     private HolderConfig<IMessage> incomingTextConfig;
     private HolderConfig<IMessage> outcomingTextConfig;
@@ -59,6 +64,9 @@ public class MessageHolders {
 
         this.unreadHeaderHolder = DefaultUnreadHeaderViewHolder.class;
         this.unreadHeaderLayout = R.layout.item_unread_header;
+
+        this.loadMoreProgressHolder = DefaultLoadMoreProgressViewHolder.class;
+        this.loadMoreProgressLayout = R.layout.item_load_more_progress;
 
         this.incomingTextConfig = new HolderConfig<>(DefaultIncomingTextMessageViewHolder.class, R.layout.item_incoming_text_message);
         this.outcomingTextConfig = new HolderConfig<>(DefaultOutcomingTextMessageViewHolder.class, R.layout.item_outcoming_text_message);
@@ -403,6 +411,21 @@ public class MessageHolders {
     }
 
     /**
+     * Sets both of custom view holder class and layout resource for show load more progress.
+     *
+     * @param holder holder class.
+     * @param layout layout resource.
+     * @return {@link MessageHolders} for subsequent configuration.
+     */
+    public MessageHolders setLoadMoreProgressConfig(
+            @NonNull Class<? extends ViewHolder<LoadMoreProgress>> holder,
+            @LayoutRes int layout) {
+        this.loadMoreProgressHolder = holder;
+        this.loadMoreProgressLayout = layout;
+        return this;
+    }
+
+    /**
      * Sets both of custom view holder class and layout resource for date header.
      *
      * @param holder holder class.
@@ -412,8 +435,8 @@ public class MessageHolders {
     public MessageHolders setDateHeaderConfig(
             @NonNull Class<? extends ViewHolder<Date>> holder,
             @LayoutRes int layout) {
-        this.dateHeaderHolder = holder;
-        this.dateHeaderLayout = layout;
+        setDateHeaderHolder(holder);
+        setDateHeaderLayout(layout);
         return this;
     }
 
@@ -588,6 +611,8 @@ public class MessageHolders {
                 return getHolder(parent, unreadHeaderLayout, unreadHeaderHolder, messagesListStyle, null);
             case VIEW_TYPE_DATE_HEADER:
                 return getHolder(parent, dateHeaderLayout, dateHeaderHolder, messagesListStyle, null);
+            case VIEW_TYPE_PROGRESS:
+                return getHolder(parent, loadMoreProgressLayout, loadMoreProgressHolder, messagesListStyle, null);
             case VIEW_TYPE_TEXT_MESSAGE:
                 return getHolder(parent, incomingTextConfig, messagesListStyle);
             case -VIEW_TYPE_TEXT_MESSAGE:
@@ -649,6 +674,8 @@ public class MessageHolders {
 
         } else if (item instanceof MessageUnread) {
             viewType = VIEW_TYPE_UNREAD_MESSAGE;
+        } else if (item instanceof LoadMoreProgress) {
+            viewType = VIEW_TYPE_PROGRESS;
         } else viewType = VIEW_TYPE_DATE_HEADER;
 
         return isOutcoming ? viewType * -1 : viewType;
@@ -1102,6 +1129,28 @@ public class MessageHolders {
 
         @Override
         public void applyStyle(MessagesListStyle style) {}
+    }
+
+    /**
+     * Default view holder implementation for show load more progress
+     */
+    public static class DefaultLoadMoreProgressViewHolder extends ViewHolder<LoadMoreProgress>
+            implements DefaultMessageViewHolder {
+
+        protected CircularProgressIndicator progressIndicator;
+
+        public DefaultLoadMoreProgressViewHolder(View itemView) {
+            super(itemView);
+            progressIndicator = itemView.findViewById(R.id.progress);
+        }
+
+        @Override
+        public void onBind(LoadMoreProgress loadMoreProgress) {
+        }
+
+        @Override
+        public void applyStyle(MessagesListStyle style) {
+        }
     }
 
     /**
