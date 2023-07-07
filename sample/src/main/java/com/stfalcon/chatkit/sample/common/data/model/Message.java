@@ -16,6 +16,7 @@ public class Message implements IMessage,
     private String text;
     private Date createdAt;
     private Boolean unread;
+    private Boolean systemGenerated = false;
     private User user;
     private Image image;
     private Voice voice;
@@ -98,6 +99,10 @@ public class Message implements IMessage,
         this.unread = unread;
     }
 
+    public void setSystemGenerated(Boolean systemGenerated) {
+        this.systemGenerated = systemGenerated;
+    }
+
     public static class Image {
 
         private String url;
@@ -124,5 +129,10 @@ public class Message implements IMessage,
         public int getDuration() {
             return duration;
         }
+    }
+
+    @Override
+    public Boolean isSystemMessage() {
+        return systemGenerated;
     }
 }

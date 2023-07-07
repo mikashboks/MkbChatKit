@@ -21,8 +21,8 @@ import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.commons.ViewHolder;
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.LoadMoreProgress;
-import com.stfalcon.chatkit.commons.models.MessageUnread;
 import com.stfalcon.chatkit.commons.models.MessageContentType;
+import com.stfalcon.chatkit.commons.models.MessageUnread;
 import com.stfalcon.chatkit.utils.DateFormatter;
 import com.stfalcon.chatkit.utils.RoundedImageView;
 
@@ -34,7 +34,7 @@ import java.util.List;
 /*
  * Created by troy379 on 31.03.17.
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "WrongConstant"})
 public class MessageHolders {
 
     private static final short VIEW_TYPE_DATE_HEADER = 130;
@@ -42,13 +42,16 @@ public class MessageHolders {
     private static final short VIEW_TYPE_IMAGE_MESSAGE = 132;
     private static final short VIEW_TYPE_UNREAD_MESSAGE = 134;
     private static final short VIEW_TYPE_PROGRESS = 135;
+    private static final short VIEW_TYPE_SYSTEM_MESSAGE = 136;
 
     private Class<? extends ViewHolder<Date>> dateHeaderHolder;
     private Class<? extends ViewHolder<MessageUnread>> unreadHeaderHolder;
     private Class<? extends ViewHolder<LoadMoreProgress>> loadMoreProgressHolder;
+    private Class<? extends ViewHolder<IMessage>> systemMessageHolder;
     private int dateHeaderLayout;
     private int unreadHeaderLayout;
     private int loadMoreProgressLayout;
+    private int systemMessageLayout;
 
     private HolderConfig<IMessage> incomingTextConfig;
     private HolderConfig<IMessage> outcomingTextConfig;
@@ -67,6 +70,9 @@ public class MessageHolders {
 
         this.loadMoreProgressHolder = DefaultLoadMoreProgressViewHolder.class;
         this.loadMoreProgressLayout = R.layout.item_load_more_progress;
+
+        this.systemMessageHolder = DefaultSystemMessageViewHolder.class;
+        this.systemMessageLayout = R.layout.item_system_message;
 
         this.incomingTextConfig = new HolderConfig<>(DefaultIncomingTextMessageViewHolder.class, R.layout.item_incoming_text_message);
         this.outcomingTextConfig = new HolderConfig<>(DefaultOutcomingTextMessageViewHolder.class, R.layout.item_outcoming_text_message);
@@ -411,6 +417,21 @@ public class MessageHolders {
     }
 
     /**
+     * Sets both of custom view holder class and layout resource for system message
+     *
+     * @param holder holder class.
+     * @param layout layout resource.
+     * @return {@link MessageHolders} for subsequent configuration.
+     */
+    public MessageHolders setSystemMessageConfig(
+            @NonNull Class<? extends ViewHolder<IMessage>> holder,
+            @LayoutRes int layout) {
+        this.systemMessageHolder = holder;
+        this.systemMessageLayout = layout;
+        return this;
+    }
+
+    /**
      * Sets both of custom view holder class and layout resource for show load more progress.
      *
      * @param holder holder class.
@@ -613,6 +634,8 @@ public class MessageHolders {
                 return getHolder(parent, dateHeaderLayout, dateHeaderHolder, messagesListStyle, null);
             case VIEW_TYPE_PROGRESS:
                 return getHolder(parent, loadMoreProgressLayout, loadMoreProgressHolder, messagesListStyle, null);
+            case VIEW_TYPE_SYSTEM_MESSAGE:
+                return getHolder(parent, systemMessageLayout, systemMessageHolder, messagesListStyle, null);
             case VIEW_TYPE_TEXT_MESSAGE:
                 return getHolder(parent, incomingTextConfig, messagesListStyle);
             case -VIEW_TYPE_TEXT_MESSAGE:
@@ -642,7 +665,7 @@ public class MessageHolders {
                         final DateFormatter.Formatter dateHeadersFormatter,
                         final SparseArray<MessagesListAdapter.OnMessageViewClickListener> clickListenersArray) {
 
-        if (item instanceof IMessage) {
+        if (item instanceof IMessage && !((IMessage) item).isSystemMessage()) {
             ((MessageHolders.BaseMessageViewHolder) holder).isSelected = isSelected;
             ((MessageHolders.BaseMessageViewHolder) holder).imageLoader = imageLoader;
             holder.itemView.setOnLongClickListener(onMessageLongClickListener);
@@ -669,9 +692,12 @@ public class MessageHolders {
 
         if (item instanceof IMessage) {
             IMessage message = (IMessage) item;
-            isOutcoming = message.getUser().getId().contentEquals(senderId);
-            viewType = getContentViewType(message);
-
+            if (message.isSystemMessage()) {
+                viewType = VIEW_TYPE_SYSTEM_MESSAGE;
+            } else {
+                isOutcoming = message.getUser().getId().contentEquals(senderId);
+                viewType = getContentViewType(message);
+            }
         } else if (item instanceof MessageUnread) {
             viewType = VIEW_TYPE_UNREAD_MESSAGE;
         } else if (item instanceof LoadMoreProgress) {
@@ -1108,6 +1134,31 @@ public class MessageHolders {
     }
 
     /**
+     * Default view holder implementation for system messages
+     * like member added or removed or any generate notification
+     */
+    public static class DefaultSystemMessageViewHolder extends ViewHolder<IMessage>
+            implements DefaultMessageViewHolder {
+
+        protected TextView text;
+
+        public DefaultSystemMessageViewHolder(View itemView) {
+            super(itemView);
+            text = itemView.findViewById(R.id.messageText);
+        }
+
+        @Override
+        public void onBind(IMessage iMessage) {
+            if (text != null) {
+                text.setText(iMessage.getText());
+            }
+        }
+
+        @Override
+        public void applyStyle(MessagesListStyle style) {}
+    }
+
+    /**
      * Default view holder implementation for unread header
      */
     public static class DefaultUnreadHeaderViewHolder extends ViewHolder<MessageUnread>
@@ -1128,7 +1179,8 @@ public class MessageHolders {
         }
 
         @Override
-        public void applyStyle(MessagesListStyle style) {}
+        public void applyStyle(MessagesListStyle style) {
+        }
     }
 
     /**

@@ -24,16 +24,14 @@ import java.util.Locale
 abstract class DemoMessagesActivity : AppCompatActivity(),
     MessagesListAdapter.SelectionListener,
     MessagesListAdapter.OnLoadMoreListener {
-    @JvmField
+
     protected val senderId = "0"
-    @JvmField
     protected var imageLoader: ImageLoader? = null
-    @JvmField
-    protected var messagesAdapter: MessagesListAdapter<Message>? =
-        null
+    protected var messagesAdapter: MessagesListAdapter<Message>? = null
     private var menu: Menu? = null
     private var selectionCount = 0
     private var lastLoadedDate: Date? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         imageLoader =
@@ -81,10 +79,7 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
         }
     }
 
-    override fun onLoadMore(
-        page: Int,
-        totalItemsCount: Int
-    ) {
+    override fun onLoadMore(page: Int, totalItemsCount: Int) {
         Log.i("TAG", "onLoadMore: $page $totalItemsCount")
         if (totalItemsCount < TOTAL_MESSAGES_COUNT) {
             loadMessages(true)

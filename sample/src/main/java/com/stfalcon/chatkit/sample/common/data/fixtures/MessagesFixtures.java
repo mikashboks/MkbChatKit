@@ -46,15 +46,20 @@ public final class MessagesFixtures extends FixturesData {
                     message = getImageMessage();
                 } else {
                     message = getTextMessage();
+
+                    if (j == countPerDay - 2) {
+                        message.setSystemGenerated(true);
+                    }
                 }
 
                 Calendar calendar = Calendar.getInstance();
-                if (startDate != null) calendar.setTime(startDate);
+                if (startDate != null)
+                    calendar.setTime(startDate);
                 calendar.add(Calendar.DAY_OF_MONTH, -(i * i + 1));
 
                 message.setCreatedAt(calendar.getTime());
 
-                if(j == countPerDay - 1) {
+                if (j == countPerDay - 1) {
                     message.setUnread(true);
                 }
                 messages.add(message);
