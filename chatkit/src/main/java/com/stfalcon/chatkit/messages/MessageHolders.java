@@ -978,7 +978,7 @@ public class MessageHolders {
         public void onBind(MESSAGE message) {
             super.onBind(message);
             if (image != null && imageLoader != null) {
-                imageLoader.loadImage(image, message.getImageUrl(), getPayloadForImageLoader(message));
+                imageLoader.loadImage(image, message.getImageUrl(), message);
             }
 
             if (imageOverlay != null) {
@@ -998,15 +998,6 @@ public class MessageHolders {
             if (imageOverlay != null) {
                 ViewCompat.setBackground(imageOverlay, style.getIncomingImageOverlayDrawable());
             }
-        }
-
-        /**
-         * Override this method to have ability to pass custom data in ImageLoader for loading image(not avatar).
-         *
-         * @param message Message with image
-         */
-        protected Object getPayloadForImageLoader(MESSAGE message) {
-            return null;
         }
 
         private void init(View itemView) {
@@ -1048,7 +1039,7 @@ public class MessageHolders {
         public void onBind(MESSAGE message) {
             super.onBind(message);
             if (image != null && imageLoader != null) {
-                imageLoader.loadImage(image, message.getImageUrl(), getPayloadForImageLoader(message));
+                imageLoader.loadImage(image, message.getImageUrl(), message);
             }
 
             if (imageOverlay != null) {
@@ -1068,15 +1059,6 @@ public class MessageHolders {
             if (imageOverlay != null) {
                 ViewCompat.setBackground(imageOverlay, style.getOutcomingImageOverlayDrawable());
             }
-        }
-
-        /**
-         * Override this method to have ability to pass custom data in ImageLoader for loading image(not avatar).
-         *
-         * @param message Message with image
-         */
-        protected Object getPayloadForImageLoader(MESSAGE message) {
-            return null;
         }
 
         private void init(View itemView) {
@@ -1238,7 +1220,7 @@ public class MessageHolders {
 
                 userAvatar.setVisibility(isAvatarExists ? View.VISIBLE : View.GONE);
                 if (isAvatarExists) {
-                    imageLoader.loadImage(userAvatar, message.getUser().getAvatar(), null);
+                    imageLoader.loadImage(userAvatar, message.getUser().getAvatar(), message);
                 }
             }
         }

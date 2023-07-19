@@ -54,7 +54,7 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
 
     protected static boolean isSelectionModeEnabled;
 
-    public List<Wrapper<Object>> items;
+    private List<Wrapper<Object>> items;
     private MessageHolders holders;
     private String senderId;
 
@@ -139,6 +139,10 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
             }
         }
         return count;
+    }
+
+    public List<Wrapper<Object>> getMessages() {
+        return items;
     }
 
     /*

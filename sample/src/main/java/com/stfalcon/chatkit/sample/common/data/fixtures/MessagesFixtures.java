@@ -59,7 +59,7 @@ public final class MessagesFixtures extends FixturesData {
 
                 message.setCreatedAt(calendar.getTime());
 
-                if (j == countPerDay - 1) {
+                if (i == 4 && j == countPerDay - 1) {
                     message.setUnread(true);
                 }
                 messages.add(message);
