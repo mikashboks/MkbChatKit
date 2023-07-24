@@ -4,13 +4,10 @@ import com.stfalcon.chatkit.commons.models.IMessage
 import com.stfalcon.chatkit.messages.MessagesListAdapter.Wrapper
 
 object ListUtils {
-    fun <MESSAGE : Wrapper<*>> findItemByTimeIndex(
-        source: List<MESSAGE>,
-        item: IMessage
-    ): Int {
+    fun <MESSAGE : Wrapper<Any>> findSmallItemIndex(source: List<MESSAGE>, item: IMessage): Int {
         return source.indexOfFirst {
             if (it.item is IMessage) {
-                (it.item as IMessage).createdAt.time < item.createdAt.time
+                (it.item as IMessage).createdAt.time > item.createdAt.time
             } else false
         }
     }

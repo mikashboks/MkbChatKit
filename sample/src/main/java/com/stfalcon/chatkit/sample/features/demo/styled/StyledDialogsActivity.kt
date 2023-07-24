@@ -26,7 +26,7 @@ class StyledDialogsActivity : DemoDialogsActivity(),
         StyledMessagesActivity.open(this)
     }
 
-    override fun format(date: Date): String {
+    override fun format(date: Date?): String {
         return if (DateFormatter.isToday(
                 date
             )

@@ -30,6 +30,6 @@ public class OutcomingVoiceMessageViewHolder
         tvDuration.setText(
                 FormatUtils.getDurationString(
                         message.getVoice().getDuration()));
-        tvTime.setText(DateFormatter.format(message.getCreatedAt(), DateFormatter.Template.TIME));
+        tvTime.setText(DateFormatter.format(message.getCreatedAt(), DateFormatter.Template.TIME.get()));
     }
 }

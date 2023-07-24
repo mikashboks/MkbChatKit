@@ -701,7 +701,7 @@ public class DialogsListAdapter<DIALOG extends IDialog>
         }
 
         protected String getDateString(Date date) {
-            return DateFormatter.format(date, DateFormatter.Template.TIME);
+            return DateFormatter.format(date, DateFormatter.Template.TIME.get());
         }
 
         protected DialogListStyle getDialogStyle() {

@@ -44,19 +44,21 @@ import com.stfalcon.chatkit.messages.MessageHolders.IncomingTextMessageViewHolde
 import com.stfalcon.chatkit.messages.MessageHolders.OutcomingTextMessageViewHolder
 import com.stfalcon.chatkit.utils.CollectionUtils
 import com.stfalcon.chatkit.utils.DateFormatter
+import com.stfalcon.chatkit.utils.ListUtils
 import java.util.Collections
 import java.util.Date
 
 /**
  * Adapter for [MessagesList].
  */
-class MessagesListAdapter<MESSAGE : IMessage?>(
+open class MessagesListAdapter<MESSAGE : IMessage?>(
     private val senderId: String?,
     private val holders: MessageHolders,
     private val imageLoader: ImageLoader?
 ) : RecyclerView.Adapter<ViewHolder<*>>(),
     RecyclerScrollMoreListener.OnLoadMoreListener {
-    private val items: MutableList<Wrapper<Any?>>?
+
+    private val items: MutableList<Wrapper<Any>>
     private var selectedItemsCount = 0
     private var selectionListener: SelectionListener? = null
     private var loadMoreListener: OnLoadMoreListener? = null
@@ -146,7 +148,7 @@ class MessagesListAdapter<MESSAGE : IMessage?>(
 
     override fun getMessagesCount(): Int {
         var count = 0
-        for (item in items!!) {
+        for (item in items) {
             if (item.item is IMessage) {
                 count++
             }
@@ -154,7 +156,7 @@ class MessagesListAdapter<MESSAGE : IMessage?>(
         return count
     }
 
-    val messages: List<Wrapper<Any?>>?
+    val messages: List<Wrapper<Any>>
         get() = items
     /*
      * PUBLIC METHODS
@@ -169,14 +171,14 @@ class MessagesListAdapter<MESSAGE : IMessage?>(
         val isNewMessageToday =
             !isPreviousSameDate(0, message!!.createdAt)
         if (isNewMessageToday) {
-            items!!.add(
+            items.add(
                 0, Wrapper(
-                    message.createdAt
-                )
+                message.createdAt
+            )
             )
         }
-        val element = Wrapper<Any?>(message)
-        items!!.add(0, element)
+        val element = Wrapper<Any>(message)
+        items.add(0, element)
         notifyItemRangeInserted(
             0,
             if (isNewMessageToday) 2 else 1
@@ -192,30 +194,21 @@ class MessagesListAdapter<MESSAGE : IMessage?>(
      * @param messages messages from history.
      * @param reverse  `true` if need to reverse messages before adding.
      */
-    fun addToEnd(
-        messages: List<MESSAGE?>,
-        reverse: Boolean
-    ) {
+    fun addToEnd(messages: List<MESSAGE>, reverse: Boolean) {
         if (messages.isEmpty()) return
-        if (reverse) Collections.reverse(messages)
-        if (!items!!.isEmpty()) {
+        val sortedMessage = messages.sortedBy { it?.createdAt?.time }
+        if (reverse) Collections.reverse(sortedMessage)
+        if (items.isNotEmpty()) {
             val lastItemPosition = items.size - 1
-            val lastItem =
-                items[lastItemPosition].item as Date?
-            if (DateFormatter.isSameDay(
-                    messages[0]!!.createdAt, lastItem
-                )
-            ) {
+            val lastItem = items[lastItemPosition].item as Date?
+            if (DateFormatter.isSameDay(sortedMessage[0]!!.createdAt, lastItem)) {
                 items.removeAt(lastItemPosition)
                 notifyItemRemoved(lastItemPosition)
             }
         }
         val oldSize = items.size
-        generateHeaders(messages)
-        notifyItemRangeInserted(
-            oldSize,
-            items.size - oldSize
-        )
+        generateHeaders(sortedMessage)
+        notifyItemRangeInserted(oldSize, items.size - oldSize)
     }
 
     /**
@@ -239,11 +232,8 @@ class MessagesListAdapter<MESSAGE : IMessage?>(
     ): Boolean {
         val position = getMessagePositionById(oldId)
         return if (position >= 0) {
-            val element =
-                Wrapper<Any?>(
-                    newMessage
-                )
-            items!![position] = element
+            val element = Wrapper<Any>(newMessage!!)
+            items[position] = element
             notifyItemChanged(position)
             true
         } else {
@@ -261,8 +251,8 @@ class MessagesListAdapter<MESSAGE : IMessage?>(
             newMessage!!.id
         )
         if (position >= 0) {
-            val element = Wrapper<Any?>(newMessage)
-            items!!.removeAt(position)
+            val element = Wrapper<Any>(newMessage)
+            items.removeAt(position)
             items.add(0, element)
             notifyItemMoved(position, 0)
             notifyItemChanged(0)
@@ -579,55 +569,51 @@ class MessagesListAdapter<MESSAGE : IMessage?>(
                 }
             }
         }
-        Collections.reverse(indicesToDelete)
+        indicesToDelete.reverse()
         for (i in indicesToDelete) {
             items.removeAt(i)
             notifyItemRemoved(i)
         }
     }
 
-    protected fun generateHeaders(messages: List<MESSAGE?>) {
+    private fun generateHeaders(messages: List<MESSAGE>) {
         for (i in messages.indices) {
             val message = messages[i]
-            items!!.add(Wrapper(message))
 
-            // Generate total unread
-            if (message!!.isUnread && !CollectionUtils.hasUnreadMessages(
-                    items
-                )
-            ) {
-                items.add(
-                    Wrapper(
-                        MessageUnread(
-                            CollectionUtils.countUnreadMessages(
-                                items
-                            )
-                        )
-                    )
-                )
-            }
-            if (messages.size > i + 1) {
-                // add unread message item
-                val nextMessage = messages[i + 1]
-                if (!DateFormatter.isSameDay(
-                        message.createdAt,
-                        nextMessage!!.createdAt
-                    )
-                ) {
-                    items.add(
-                        Wrapper(
-                            message.createdAt
-                        )
-                    )
+            val messagePos = ListUtils.findSmallItemIndex(this.items, message!!)
+            if (messagePos != -1 && messagePos != 0) { // must not be last element
+                this.items.add(messagePos, Wrapper(message))
+            } else { // normal flow
+
+                items.add(Wrapper(message))
+
+                // Generate total unread
+                if (message.isUnread && !CollectionUtils.hasUnreadMessages(items)) {
+                    items.add(Wrapper(MessageUnread(CollectionUtils.countUnreadMessages(items))))
                 }
-            } else {
-                items.add(
-                    Wrapper(
-                        message.createdAt
-                    )
-                )
+                if (messages.size > i + 1) {
+                    // add unread message item
+                    val nextMessage = messages[i + 1]
+                    if (!DateFormatter.isSameDay(message.createdAt, nextMessage!!.createdAt)) {
+                        items.add(Wrapper(message.createdAt))
+                    }
+                } else items.add(Wrapper(message.createdAt))
             }
         }
+    }
+
+    private fun checkNextItemDatesAreSame(messagePosition: Int, message: MESSAGE & Any) {
+        var nextPosition = messagePosition + 1
+        do {
+            val nextMessageItem = items.getOrNull(nextPosition)?.item
+            if (nextPosition < (items.size - 1) && nextMessageItem is IMessage) {
+                if (DateFormatter.isBeforeDay(message.createdAt, nextMessageItem.createdAt)) {
+                    items.add(Wrapper(message.createdAt))
+                    return
+                }
+            }
+            nextPosition++
+        } while (nextMessageItem != null)
     }
 
     private fun getMessagePositionById(id: String): Int {
@@ -664,7 +650,7 @@ class MessagesListAdapter<MESSAGE : IMessage?>(
     ): Boolean {
         val prevPosition = position + 1
         return if (items!!.size <= prevPosition) false else (items[prevPosition].item is IMessage
-                && (items[prevPosition].item as MESSAGE?)!!.user.id.contentEquals(
+            && (items[prevPosition].item as MESSAGE?)!!.user.id.contentEquals(
             id
         ))
     }
@@ -749,7 +735,10 @@ class MessagesListAdapter<MESSAGE : IMessage?>(
             val messageItem = (wrapper.item as MESSAGE)!!
             if (selectionListener == null) {
                 notifyMessageLongClicked(messageItem)
-                notifyMessageViewLongClicked(view, messageItem)
+                notifyMessageViewLongClicked(
+                    view,
+                    messageItem
+                )
             } else {
                 isSelectionModeEnabled = true
                 view.performClick()
