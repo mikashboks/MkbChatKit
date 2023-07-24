@@ -17,7 +17,7 @@ import com.stfalcon.chatkit.sample.features.demo.DemoMessagesActivity
 import com.stfalcon.chatkit.sample.utils.AppUtils
 
 class CustomLayoutMessagesActivity : DemoMessagesActivity(),
-    OnMessageLongClickListener<Message?>, InputListener,
+    InputListener,
     AttachmentsListener {
     private var messagesList: MessagesList? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,14 +45,6 @@ class CustomLayoutMessagesActivity : DemoMessagesActivity(),
         )
     }
 
-    override fun onMessageLongClick(message: Message?) {
-        AppUtils.showToast(
-            this,
-            R.string.on_log_click_message,
-            false
-        )
-    }
-
     private fun initAdapter() {
         val holdersConfig = MessageHolders()
             .setIncomingTextLayout(R.layout.item_custom_incoming_text_message)
@@ -64,9 +56,16 @@ class CustomLayoutMessagesActivity : DemoMessagesActivity(),
             holdersConfig,
             super.imageLoader
         )
-        super.messagesAdapter!!.setOnMessageLongClickListener(
-            this
-        )
+        messagesAdapter!!.setOnMessageLongClickListener(object : OnMessageLongClickListener<Message>{
+            override fun onMessageLongClick(message: Message) {
+                AppUtils.showToast(
+                    this@CustomLayoutMessagesActivity,
+                    R.string.on_log_click_message,
+                    false
+                )
+            }
+
+        })
         super.messagesAdapter!!.setLoadMoreListener(this)
         messagesList!!.setAdapter(super.messagesAdapter)
     }

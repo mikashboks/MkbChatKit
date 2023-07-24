@@ -9,6 +9,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.squareup.picasso.Picasso
 import com.stfalcon.chatkit.commons.ImageLoader
+import com.stfalcon.chatkit.commons.models.IMessage
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import com.stfalcon.chatkit.sample.R
 import com.stfalcon.chatkit.sample.common.data.fixtures.MessagesFixtures
@@ -114,19 +115,22 @@ abstract class DemoMessagesActivity : AppCompatActivity(),
         }
     }
 
-    private val messageStringFormatter: MessagesListAdapter.Formatter<Message>
-        private get() = MessagesListAdapter.Formatter { message: Message ->
-            val createdAt = SimpleDateFormat(
-                "MMM d, EEE 'at' h:mm a",
-                Locale.getDefault()
-            )
-                .format(message.createdAt)
-            var text = message.text
-            if (text == null) text = "[attachment]"
-            String.format(
-                Locale.getDefault(), "%s: %s (%s)",
-                message.user.name, text, createdAt
-            )
+    private val messageStringFormatter: MessagesListAdapter.Formatter<Message?>
+        get() = object: MessagesListAdapter.Formatter<Message?> {
+            override fun format(message: Message?): String? {
+                if(message == null) return null
+                val createdAt = SimpleDateFormat(
+                    "MMM d, EEE 'at' h:mm a",
+                    Locale.getDefault()
+                )
+                    .format(message.createdAt)
+                var text = message.text
+                if (text == null) text = "[attachment]"
+                return String.format(
+                    Locale.getDefault(), "%s: %s (%s)",
+                    message.user.name, text, createdAt
+                )
+            }
         }
 
     companion object {

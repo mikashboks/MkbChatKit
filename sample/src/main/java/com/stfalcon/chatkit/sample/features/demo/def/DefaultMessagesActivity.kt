@@ -53,14 +53,15 @@ class DefaultMessagesActivity : DemoMessagesActivity(),
         super.messagesAdapter!!.enableSelectionMode(this)
         super.messagesAdapter!!.setLoadMoreListener(this)
         super.messagesAdapter!!.registerViewClickListener(
-            com.mikashboks.chatkit.R.id.messageUserAvatar
-        ) { view: View?, message: Message ->
-            AppUtils.showToast(
-                this@DefaultMessagesActivity,
-                message.user.name + " avatar click",
-                false
-            )
-        }
+            com.mikashboks.chatkit.R.id.messageUserAvatar, object: MessagesListAdapter.OnMessageViewClickListener<Message>{
+                override fun onMessageViewClick(view: View?, message: Message) {
+                    AppUtils.showToast(
+                        this@DefaultMessagesActivity,
+                        message.user.name + " avatar click",
+                        false
+                    )
+                }
+            })
         messagesList!!.setAdapter(super.messagesAdapter)
     }
 

@@ -35,7 +35,7 @@ import com.stfalcon.chatkit.commons.Style;
  * Style for MessagesListStyle customization by xml attributes
  */
 @SuppressWarnings("WeakerAccess")
-class MessagesListStyle extends Style {
+public class MessagesListStyle extends Style {
 
     private int textAutoLinkMask;
     private int incomingTextLinkColor;

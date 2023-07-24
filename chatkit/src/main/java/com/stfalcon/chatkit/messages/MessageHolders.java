@@ -811,15 +811,6 @@ public class MessageHolders {
             return MessagesListAdapter.isSelectionModeEnabled;
         }
 
-        /**
-         * Getter for {@link #imageLoader}
-         *
-         * @return image loader interface.
-         */
-        public ImageLoader getImageLoader() {
-            return imageLoader;
-        }
-
         protected void configureLinksBehavior(final TextView text) {
             text.setLinksClickable(false);
             text.setMovementMethod(new LinkMovementMethod() {

@@ -23,9 +23,8 @@ import com.stfalcon.chatkit.sample.features.demo.custom.holder.holders.messages.
 import com.stfalcon.chatkit.sample.features.demo.custom.holder.holders.messages.CustomOutcomingTextMessageViewHolder
 import com.stfalcon.chatkit.sample.utils.AppUtils
 
-class CustomHolderMessagesActivity : DemoMessagesActivity(),
-    OnMessageLongClickListener<Message?>, InputListener,
-    AttachmentsListener {
+class CustomHolderMessagesActivity : DemoMessagesActivity(), InputListener, AttachmentsListener {
+
     private var messagesList: MessagesList? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,14 +48,6 @@ class CustomHolderMessagesActivity : DemoMessagesActivity(),
         messagesAdapter!!.addToStart(
             MessagesFixtures.getImageMessage(),
             true
-        )
-    }
-
-    override fun onMessageLongClick(message: Message?) {
-        AppUtils.showToast(
-            this,
-            R.string.on_log_click_message,
-            false
         )
     }
 
@@ -91,15 +82,18 @@ class CustomHolderMessagesActivity : DemoMessagesActivity(),
                 CustomOutcomingImageMessageViewHolder::class.java,
                 R.layout.item_custom_outcoming_image_message
             )
-        super.messagesAdapter = MessagesListAdapter(
-            super.senderId,
-            holdersConfig,
-            super.imageLoader
-        )
-        super.messagesAdapter!!.setOnMessageLongClickListener(
-            this
-        )
-        super.messagesAdapter!!.setLoadMoreListener(this)
+        messagesAdapter = MessagesListAdapter(super.senderId, holdersConfig, super.imageLoader)
+        messagesAdapter!!.setOnMessageLongClickListener(object : OnMessageLongClickListener<Message>{
+            override fun onMessageLongClick(message: Message) {
+                AppUtils.showToast(
+                    this@CustomHolderMessagesActivity,
+                    R.string.on_log_click_message,
+                    false
+                )
+            }
+
+        })
+        messagesAdapter!!.setLoadMoreListener(this)
         messagesList!!.setAdapter(super.messagesAdapter)
     }
 

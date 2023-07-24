@@ -22,7 +22,7 @@ public class CollectionUtils {
                     hasUnread = false;
                     break;
                 }
-                if (ii.next().item instanceof MessageUnread) {
+                if (ii.next().getItem() instanceof MessageUnread) {
                     hasUnread = true;
                     break;
                 }
@@ -42,8 +42,8 @@ public class CollectionUtils {
 
             for (Wrapper<DATA> it : items) {
                 boolean var9;
-                if (it.item instanceof IMessage) {
-                    Object iMessage = it.item;
+                if (it.getItem() instanceof IMessage) {
+                    Object iMessage = it.getItem();
                     var9 = ((IMessage) iMessage).isUnread();
                 } else {
                     var9 = false;
